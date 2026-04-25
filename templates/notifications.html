@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-hero">
+  <div class="page-hero-content">
+    <h1><i class="fas fa-bell"></i> Notifications</h1>
+    <p>All your match alerts and messages</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container" style="max-width:800px">
+    {% if notifications %}
+    <div class="notifications-list">
+      {% for notif in notifications %}
+      <div class="notif-item {% if notif.status == 'unread' %}notif-unread{% endif %}">
+        <div class="notif-icon"><i class="fas fa-bell"></i></div>
+        <div class="notif-content">
+          <p>{{ notif.message }}</p>
+          <span class="notif-time"><i class="fas fa-clock"></i> {{ notif.sent_on.strftime('%d %b %Y, %I:%M %p') }}</span>
+        </div>
+        {% if notif.status == 'unread' %}
+        <span class="notif-badge">New</span>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    <form method="POST" action="{{ url_for('mark_notifications_read') }}" style="margin-top:1.5rem;text-align:center">
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-check-double"></i> Mark All as Read
+      </button>
+    </form>
+    {% else %}
+    <div class="empty-state">
+      <i class="fas fa-bell-slash"></i>
+      <p>No notifications yet.</p>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

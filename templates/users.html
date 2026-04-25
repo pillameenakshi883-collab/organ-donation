@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-hero">
+  <div class="page-hero-content">
+    <h1><i class="fas fa-users"></i> Registered Users</h1>
+    <p>Browse all donors and receivers in the system</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('donors')">
+        <i class="fas fa-hand-holding-heart"></i> Donors ({{ donors | length }})
+      </button>
+      <button class="tab-btn" onclick="showTab('receivers')">
+        <i class="fas fa-user-injured"></i> Receivers ({{ receivers | length }})
+      </button>
+    </div>
+
+    <div id="donors" class="tab-content active">
+      {% if donors %}
+      <div class="users-grid">
+        {% for acc, entry in donors %}
+        <div class="user-card">
+          <div class="user-card-header">
+            <div class="user-avatar"><i class="fas fa-user"></i></div>
+            <div>
+              <h3>{{ acc.name }}</h3>
+              <span class="role-badge role-donor"><i class="fas fa-hand-holding-heart"></i> Donor</span>
+            </div>
+          </div>
+          <div class="user-card-body">
+            <div class="user-detail"><i class="fas fa-tint"></i> <span>{{ acc.blood_group }}</span></div>
+            <div class="user-detail"><i class="fas fa-heartbeat"></i> <span>{{ entry.organ }}</span></div>
+            <div class="user-detail"><i class="fas fa-venus-mars"></i> <span>{{ acc.gender }}</span></div>
+            <div class="user-detail"><i class="fas fa-birthday-cake"></i> <span>Age {{ acc.age }}</span></div>
+            <div class="user-detail"><i class="fas fa-map-marker-alt"></i> <span>{{ acc.city }}, {{ acc.state }}</span></div>
+            <div class="user-detail"><i class="fas fa-phone"></i> <span>{{ acc.phone }}</span></div>
+            <div class="user-detail"><i class="fas fa-envelope"></i> <span>{{ acc.email }}</span></div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state"><i class="fas fa-user-slash"></i><p>No donors registered yet.</p></div>
+      {% endif %}
+    </div>
+
+    <div id="receivers" class="tab-content">
+      {% if receivers %}
+      <div class="users-grid">
+        {% for acc, entry in receivers %}
+        <div class="user-card">
+          <div class="user-card-header">
+            <div class="user-avatar"><i class="fas fa-user"></i></div>
+            <div>
+              <h3>{{ acc.name }}</h3>
+              <span class="role-badge role-receiver"><i class="fas fa-user-injured"></i> Receiver</span>
+            </div>
+          </div>
+          <div class="user-card-body">
+            <div class="user-detail"><i class="fas fa-tint"></i> <span>{{ acc.blood_group }}</span></div>
+            <div class="user-detail"><i class="fas fa-heartbeat"></i> <span>{{ entry.organ }}</span></div>
+            <div class="user-detail"><i class="fas fa-venus-mars"></i> <span>{{ acc.gender }}</span></div>
+            <div class="user-detail"><i class="fas fa-birthday-cake"></i> <span>Age {{ acc.age }}</span></div>
+            <div class="user-detail"><i class="fas fa-map-marker-alt"></i> <span>{{ acc.city }}, {{ acc.state }}</span></div>
+            <div class="user-detail"><i class="fas fa-phone"></i> <span>{{ acc.phone }}</span></div>
+            <div class="user-detail"><i class="fas fa-envelope"></i> <span>{{ acc.email }}</span></div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state"><i class="fas fa-user-slash"></i><p>No receivers registered yet.</p></div>
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-hero admin-hero">
+  <div class="page-hero-content">
+    <h1><i class="fas fa-users"></i> Manage Users</h1>
+    <p>View, activate/deactivate, and manage all registered users</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="admin-table-wrap">
+      <div class="table-toolbar">
+        <input type="text" id="userSearch" placeholder="Search users..." class="search-input" onkeyup="filterTable()"/>
+        <span class="total-count">Total: {{ users | length }} users</span>
+      </div>
+      <table class="admin-table" id="usersTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Roles &amp; Organs</th>
+            <th>Blood</th>
+            <th>City</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in users %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ user.name }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.phone }}</td>
+            <td>
+              {% for e in user.organ_entries %}
+              <span class="role-badge role-{{ e.role }}" style="font-size:0.72rem;margin:1px">{{ e.role|capitalize }} · {{ e.organ }}</span>
+              {% endfor %}
+            </td>
+            <td>{{ user.blood_group }}</td>
+            <td>{{ user.city }}</td>
+            <td>
+              <span class="badge {% if user.is_active_user %}badge-success{% else %}badge-danger{% endif %}">
+                {{ 'Active' if user.is_active_user else 'Inactive' }}
+              </span>
+            </td>
+            <td class="action-btns">
+              <!-- Toggle Active -->
+              <form method="POST" action="{{ url_for('toggle_user', user_id=user.id) }}" style="display:inline">
+                <button type="submit" class="btn btn-sm {% if user.is_active_user %}btn-warning{% else %}btn-success{% endif %}" title="{{ 'Deactivate' if user.is_active_user else 'Activate' }}">
+                  <i class="fas fa-{% if user.is_active_user %}ban{% else %}check{% endif %}"></i>
+                </button>
+              </form>
+              <!-- Send Notification -->
+              <button class="btn btn-sm btn-primary notif-btn" data-uid="{{ user.id }}" data-uname="{{ user.name }}" title="Send Notification">
+                <i class="fas fa-bell"></i>
+              </button>
+              <!-- Delete -->
+              <form method="POST" action="{{ url_for('delete_user', user_id=user.id) }}" style="display:inline" onsubmit="return confirm('Delete {{ user.name }}?')">
+                <button type="submit" class="btn btn-sm btn-danger" title="Delete">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- Notification Modal -->
+<div id="notifModal" class="modal-overlay" style="display:none">
+  <div class="modal-box">
+    <h3><i class="fas fa-bell"></i> Send Notification</h3>
+    <p id="notifTarget"></p>
+    <form method="POST" id="notifForm">
+      <div class="form-group">
+        <label>Message</label>
+        <textarea name="message" rows="4" placeholder="Enter notification message..." required></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Send</button>
+        <button type="button" class="btn btn-outline" onclick="closeNotifModal()">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.notif-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    openNotifModal(this.dataset.uid, this.dataset.uname);
+  });
+});
+
+function openNotifModal(userId, userName) {
+  document.getElementById('notifTarget').textContent = 'To: ' + userName;
+  document.getElementById('notifForm').action = '/admin/send_notification/' + userId;
+  document.getElementById('notifModal').style.display = 'flex';
+}
+function closeNotifModal() {
+  document.getElementById('notifModal').style.display = 'none';
+}
+function filterTable() {
+  const q = document.getElementById('userSearch').value.toLowerCase();
+  const rows = document.querySelectorAll('#usersTable tbody tr');
+  rows.forEach(row => {
+    row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+</script>
+{% endblock %}

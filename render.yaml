@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: organ-donation
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m gunicorn app:app
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true

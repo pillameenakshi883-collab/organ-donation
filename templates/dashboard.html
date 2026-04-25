@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="page-hero">
+  <div class="page-hero-content">
+    <h1><i class="fas fa-tachometer-alt"></i> Dashboard</h1>
+    <p>Welcome back, <strong>{{ current_user.name }}</strong></p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+
+    <!-- Stat Cards -->
+    <div class="dash-stats-row">
+      <div class="dash-stat-card">
+        <div class="dsc-icon donors-icon"><i class="fas fa-users"></i></div>
+        <div class="dsc-info">
+          <span class="dsc-num">{{ total_users }}</span>
+          <span class="dsc-label">Total Users</span>
+        </div>
+      </div>
+      <div class="dash-stat-card">
+        <div class="dsc-icon donors-icon"><i class="fas fa-hand-holding-heart"></i></div>
+        <div class="dsc-info">
+          <span class="dsc-num">{{ total_donors }}</span>
+          <span class="dsc-label">Total Donors</span>
+        </div>
+      </div>
+      <div class="dash-stat-card">
+        <div class="dsc-icon recip-icon"><i class="fas fa-user-injured"></i></div>
+        <div class="dsc-info">
+          <span class="dsc-num">{{ total_recipients }}</span>
+          <span class="dsc-label">Total Recipients</span>
+        </div>
+      </div>
+      <div class="dash-stat-card">
+        <div class="dsc-icon match-icon"><i class="fas fa-link"></i></div>
+        <div class="dsc-info">
+          <span class="dsc-num">{{ total_matches }}</span>
+          <span class="dsc-label">Total Matches</span>
+        </div>
+      </div>
+      <div class="dash-stat-card">
+        <div class="dsc-icon my-match-icon"><i class="fas fa-heart"></i></div>
+        <div class="dsc-info">
+          <span class="dsc-num">{{ matches | length }}</span>
+          <span class="dsc-label">Your Matches</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile + Donors + Recipients -->
+    <div class="dash-main-grid dash-main-grid-3">
+
+      <!-- My Profile -->
+      <div class="dash-profile-card">
+        <div class="dpc-avatar"><i class="fas fa-user-circle"></i></div>
+        <h2>{{ current_user.name }}</h2>
+
+        {% if organ_entries %}
+        <div style="display:flex;flex-wrap:wrap;gap:0.4rem;justify-content:center;margin:0.5rem 0 0.75rem">
+          {% for e in organ_entries %}
+          <span class="role-badge role-{{ e.role }}" style="font-size:0.75rem">
+            <i class="fas fa-{% if e.role == 'donor' %}hand-holding-heart{% else %}user-injured{% endif %}"></i>
+            {{ e.role | capitalize }} · {{ e.organ }}
+          </span>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="dpc-details">
+          <div class="dpc-row"><i class="fas fa-tint"></i><span>Blood Group</span><strong>{{ current_user.blood_group }}</strong></div>
+          <div class="dpc-row"><i class="fas fa-venus-mars"></i><span>Gender</span><strong>{{ current_user.gender }}</strong></div>
+          <div class="dpc-row"><i class="fas fa-phone"></i><span>Phone</span><strong>{{ current_user.phone }}</strong></div>
+          <div class="dpc-row"><i class="fas fa-birthday-cake"></i><span>Age</span><strong>{{ current_user.age }}</strong></div>
+          <div class="dpc-row"><i class="fas fa-city"></i><span>City</span><strong>{{ current_user.city }}</strong></div>
+          <div class="dpc-row"><i class="fas fa-map-marker-alt"></i><span>State</span><strong>{{ current_user.state }}</strong></div>
+          <div class="dpc-row"><i class="fas fa-envelope"></i><span>Email</span><strong>{{ current_user.email }}</strong></div>
+          <div class="dpc-row"><i class="fas fa-calendar-alt"></i><span>Registered</span><strong>{{ current_user.registered_on.strftime('%d %b %Y') }}</strong></div>
+        </div>
+
+        <!-- My Entries with Delete -->
+        {% if organ_entries %}
+        <div style="margin-top:1.2rem;border-top:1px solid var(--border);padding-top:1rem">
+          <h4 style="font-size:0.9rem;margin-bottom:0.6rem;color:var(--dark)"><i class="fas fa-list"></i> My Entries</h4>
+          {% for e in organ_entries %}
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:0.4rem 0.6rem;background:var(--light);border-radius:8px;margin-bottom:0.4rem">
+            <span style="font-size:0.82rem">
+              <span class="role-badge role-{{ e.role }}" style="font-size:0.72rem">{{ e.role|capitalize }}</span>
+              &nbsp;{{ e.organ }}
+            </span>
+            <form method="POST" action="{{ url_for('delete_entry', entry_id=e.id) }}"
+                  onsubmit="return confirm('Delete your {{ e.role }} entry for {{ e.organ }}?')">
+              <button type="submit" class="btn btn-danger btn-sm" style="padding:3px 10px;font-size:0.75rem">
+                <i class="fas fa-trash"></i> Delete
+              </button>
+            </form>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Donors list -->
+      <div class="dash-users-panel">
+        <div class="dup-header">
+          <h3><i class="fas fa-hand-holding-heart"></i> Donors ({{ total_donors }})</h3>
+          <a href="{{ url_for('users') }}" class="btn btn-primary btn-sm">View All</a>
+        </div>
+        <div class="dup-list active">
+          {% if donor_list %}
+            {% for acc, entry in donor_list %}
+            <div class="dup-item">
+              <div class="dup-avatar"><i class="fas fa-user"></i></div>
+              <div class="dup-info">
+                <span class="dup-name">{{ acc.name }}</span>
+                <span class="dup-meta">
+                  <i class="fas fa-tint"></i> {{ acc.blood_group }} &nbsp;
+                  <i class="fas fa-heartbeat"></i> {{ entry.organ }} &nbsp;
+                  <i class="fas fa-venus-mars"></i> {{ acc.gender }} &nbsp;
+                  <i class="fas fa-birthday-cake"></i> Age {{ acc.age }} &nbsp;
+                  <i class="fas fa-map-marker-alt"></i> {{ acc.city }}, {{ acc.state }} &nbsp;
+                  <i class="fas fa-phone"></i> {{ acc.phone }} &nbsp;
+                  <i class="fas fa-envelope"></i> {{ acc.email }}
+                </span>
+              </div>
+              {% if acc.id == current_user.id or current_user.is_admin %}
+              <form method="POST" action="{{ url_for('delete_entry', entry_id=entry.id) }}"
+                    onsubmit="return confirm('Delete this entry permanently?')">
+                <button type="submit" class="btn-delete-entry" title="Delete">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </form>
+              {% endif %}
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="dup-empty"><i class="fas fa-user-slash"></i> No donors registered yet.</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Recipients list -->
+      <div class="dash-users-panel">
+        <div class="dup-header">
+          <h3><i class="fas fa-user-injured"></i> Recipients ({{ total_recipients }})</h3>
+        </div>
+        <div class="dup-list active">
+          {% if recipient_list %}
+            {% for acc, entry in recipient_list %}
+            <div class="dup-item">
+              <div class="dup-avatar recip-av"><i class="fas fa-user"></i></div>
+              <div class="dup-info">
+                <span class="dup-name">{{ acc.name }}</span>
+                <span class="dup-meta">
+                  <i class="fas fa-tint"></i> {{ acc.blood_group }} &nbsp;
+                  <i class="fas fa-heartbeat"></i> {{ entry.organ }} &nbsp;
+                  <i class="fas fa-venus-mars"></i> {{ acc.gender }} &nbsp;
+                  <i class="fas fa-birthday-cake"></i> Age {{ acc.age }} &nbsp;
+                  <i class="fas fa-map-marker-alt"></i> {{ acc.city }}, {{ acc.state }} &nbsp;
+                  <i class="fas fa-phone"></i> {{ acc.phone }} &nbsp;
+                  <i class="fas fa-envelope"></i> {{ acc.email }}
+                </span>
+              </div>
+              {% if acc.id == current_user.id or current_user.is_admin %}
+              <form method="POST" action="{{ url_for('delete_entry', entry_id=entry.id) }}"
+                    onsubmit="return confirm('Delete this entry permanently?')">
+                <button type="submit" class="btn-delete-entry" title="Delete">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </form>
+              {% endif %}
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="dup-empty"><i class="fas fa-user-slash"></i> No recipients registered yet.</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Compatible Matches -->
+    <div class="section-header mt-4">
+      <h2><i class="fas fa-heart"></i> Your Compatible Matches</h2>
+      <p>Donors/Recipients compatible with your blood group &amp; organs</p>
+    </div>
+    {% if matches %}
+    <div class="matches-grid">
+      {% for m in matches %}
+      <div class="match-card">
+        <div class="match-header">
+          <div class="match-avatar"><i class="fas fa-user"></i></div>
+          <div>
+            <h3>{{ m.account.name }}</h3>
+            <span class="role-badge role-{{ m.entry.role }}">{{ m.entry.role | capitalize }}</span>
+          </div>
+        </div>
+        <div class="match-details">
+          <span><i class="fas fa-tint"></i> {{ m.account.blood_group }}</span>
+          <span><i class="fas fa-heartbeat"></i> {{ m.entry.organ }}</span>
+          <span><i class="fas fa-map-marker-alt"></i> {{ m.account.city }}</span>
+          <span><i class="fas fa-birthday-cake"></i> Age {{ m.account.age }}</span>
+        </div>
+        <div class="match-contact"><i class="fas fa-phone"></i> {{ m.account.phone }}</div>
+        <div class="match-context" style="font-size:0.78rem;color:var(--gray);margin:0.3rem 0 0.6rem">
+          <i class="fas fa-link"></i>
+          Your <strong>{{ m.my_entry.role }}</strong> ({{ m.my_entry.organ }})
+          ↔ Their <strong>{{ m.entry.role }}</strong> ({{ m.entry.organ }})
+        </div>
+        <form method="POST" action="{{ url_for('notify_match', entry_id=m.entry.id) }}">
+          <button type="submit" class="btn btn-primary btn-sm btn-full">
+            <i class="fas fa-bell"></i> Send Notification
+          </button>
+        </form>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <i class="fas fa-search"></i>
+      <p>No matches found yet. More will appear as users register.</p>
+    </div>
+    {% endif %}
+
+    <!-- Notifications -->
+    <div class="section-header mt-4">
+      <h2><i class="fas fa-bell"></i> Recent Notifications</h2>
+    </div>
+    {% if notifications %}
+    <div class="notifications-list">
+      {% for notif in notifications %}
+      <div class="notif-item">
+        <div class="notif-icon"><i class="fas fa-bell"></i></div>
+        <div class="notif-content">
+          <p>{{ notif.message }}</p>
+          <span class="notif-time"><i class="fas fa-clock"></i> {{ notif.sent_on.strftime('%d %b %Y, %I:%M %p') }}</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <i class="fas fa-bell-slash"></i>
+      <p>No notifications yet.</p>
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+{% endblock %}

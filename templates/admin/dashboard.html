@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-hero admin-hero">
+  <div class="page-hero-content">
+    <h1><i class="fas fa-shield-alt"></i> Admin Panel</h1>
+    <p>Manage the Organ Donation Management System</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+
+    <!-- Stats Row -->
+    <div class="admin-stats-grid">
+      <div class="admin-stat-card">
+        <div class="admin-stat-icon"><i class="fas fa-users"></i></div>
+        <div class="admin-stat-info">
+          <span class="admin-stat-num">{{ total_users }}</span>
+          <span class="admin-stat-label">Total Users</span>
+        </div>
+      </div>
+      <div class="admin-stat-card">
+        <div class="admin-stat-icon donor-icon"><i class="fas fa-hand-holding-heart"></i></div>
+        <div class="admin-stat-info">
+          <span class="admin-stat-num">{{ donors }}</span>
+          <span class="admin-stat-label">Donors</span>
+        </div>
+      </div>
+      <div class="admin-stat-card">
+        <div class="admin-stat-icon receiver-icon"><i class="fas fa-user-injured"></i></div>
+        <div class="admin-stat-info">
+          <span class="admin-stat-num">{{ receivers }}</span>
+          <span class="admin-stat-label">Receivers</span>
+        </div>
+      </div>
+      <div class="admin-stat-card">
+        <div class="admin-stat-icon notif-icon"><i class="fas fa-bell"></i></div>
+        <div class="admin-stat-info">
+          <span class="admin-stat-num">{{ notifications }}</span>
+          <span class="admin-stat-label">Notifications Sent</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Organ Stats -->
+    <div class="section-header mt-4">
+      <h2><i class="fas fa-chart-bar"></i> Organ Statistics</h2>
+    </div>
+    <div class="organ-stats-table">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Organ</th>
+            <th>Donors</th>
+            <th>Receivers</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for organ, stats in organ_stats.items() %}
+          <tr>
+            <td><i class="fas fa-heartbeat"></i> {{ organ }}</td>
+            <td><span class="badge badge-donor">{{ stats.donors }}</span></td>
+            <td><span class="badge badge-receiver">{{ stats.receivers }}</span></td>
+            <td>
+              {% if stats.donors > 0 and stats.receivers > 0 %}
+                <span class="badge badge-success">Matches Possible</span>
+              {% elif stats.donors == 0 and stats.receivers > 0 %}
+                <span class="badge badge-warning">Needs Donors</span>
+              {% elif stats.donors > 0 and stats.receivers == 0 %}
+                <span class="badge badge-info">Needs Receivers</span>
+              {% else %}
+                <span class="badge badge-muted">No Registrations</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Recent Users -->
+    <div class="section-header mt-4">
+      <h2><i class="fas fa-user-clock"></i> Recent Registrations</h2>
+      <a href="{{ url_for('admin_users') }}" class="btn btn-primary btn-sm">View All</a>
+    </div>
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Roles &amp; Organs</th>
+            <th>Blood Group</th>
+            <th>City</th>
+            <th>Registered</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in recent_users %}
+          <tr>
+            <td>{{ user.name }}</td>
+            <td>
+              {% for e in user.organ_entries %}
+              <span class="role-badge role-{{ e.role }}" style="font-size:0.72rem;margin:1px">{{ e.role|capitalize }} · {{ e.organ }}</span>
+              {% endfor %}
+            </td>
+            <td>{{ user.blood_group }}</td>
+            <td>{{ user.city }}</td>
+            <td>{{ user.registered_on.strftime('%d %b %Y') }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="admin-quick-links mt-4">
+      <a href="{{ url_for('admin_users') }}" class="quick-link-card">
+        <i class="fas fa-users"></i>
+        <span>Manage Users</span>
+      </a>
+      <a href="{{ url_for('admin_matches') }}" class="quick-link-card">
+        <i class="fas fa-link"></i>
+        <span>View Matches</span>
+      </a>
+    </div>
+
+  </div>
+</section>
+{% endblock %}

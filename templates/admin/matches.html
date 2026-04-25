@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-hero admin-hero">
+  <div class="page-hero-content">
+    <h1><i class="fas fa-link"></i> Donor-Receiver Matches</h1>
+    <p>All compatible donor-receiver pairs in the system</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    {% if matches %}
+    <div class="matches-count">
+      <i class="fas fa-check-circle"></i> {{ matches | length }} compatible match(es) found
+    </div>
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Donor Name</th>
+            <th>Donor Blood</th>
+            <th>Organ</th>
+            <th>Donor City</th>
+            <th>Donor Phone</th>
+            <th></th>
+            <th>Receiver Name</th>
+            <th>Receiver Blood</th>
+            <th>Receiver City</th>
+            <th>Receiver Phone</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for m in matches %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td><strong>{{ m.donor.name }}</strong></td>
+            <td><span class="blood-badge">{{ m.donor.blood_group }}</span></td>
+            <td><span class="organ-badge">{{ m.donor_entry.organ }}</span></td>
+            <td>{{ m.donor.city }}</td>
+            <td>{{ m.donor.phone }}</td>
+            <td class="match-arrow"><i class="fas fa-arrows-left-right"></i></td>
+            <td><strong>{{ m.receiver.name }}</strong></td>
+            <td><span class="blood-badge">{{ m.receiver.blood_group }}</span></td>
+            <td>{{ m.receiver.city }}</td>
+            <td>{{ m.receiver.phone }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <i class="fas fa-search"></i>
+      <p>No compatible matches found yet. More matches will appear as users register.</p>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="auth-section">
+  <div class="auth-container auth-container-sm">
+    <div class="auth-right">
+      <div class="auth-card">
+
+        {% if add_entry_only %}
+        <h2><i class="fas fa-plus-circle"></i> Add New Organ Entry</h2>
+        <form method="POST" action="{{ url_for('register') }}" class="auth-form">
+          <div class="role-toggle">
+            <label class="role-option">
+              <input type="radio" name="role" value="donor" required/>
+              <span><i class="fas fa-hand-holding-heart"></i> Donor</span>
+            </label>
+            <label class="role-option">
+              <input type="radio" name="role" value="receiver"/>
+              <span><i class="fas fa-user-injured"></i> Recipient</span>
+            </label>
+          </div>
+          <div class="form-group">
+            <label><i class="fas fa-heartbeat"></i> Organ</label>
+            <select name="organ" required>
+              <option value="">Select Organ</option>
+              {% for organ in organs %}
+              <option value="{{ organ }}">{{ organ }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">
+            <i class="fas fa-plus-circle"></i> Add Entry
+          </button>
+        </form>
+        <p class="auth-switch"><a href="{{ url_for('dashboard') }}"><i class="fas fa-arrow-left"></i> Back to Dashboard</a></p>
+
+        {% else %}
+        <h2><i class="fas fa-user-plus"></i> Create Account</h2>
+        <form method="POST" action="{{ url_for('register') }}" class="auth-form">
+
+          <div class="role-toggle">
+            <label class="role-option">
+              <input type="radio" name="role" value="donor" required/>
+              <span><i class="fas fa-hand-holding-heart"></i> Donor</span>
+            </label>
+            <label class="role-option">
+              <input type="radio" name="role" value="receiver"/>
+              <span><i class="fas fa-user-injured"></i> Recipient</span>
+            </label>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label><i class="fas fa-user"></i> Full Name</label>
+              <input type="text" name="name" required/>
+            </div>
+            <div class="form-group">
+              <label><i class="fas fa-envelope"></i> Email</label>
+              <input type="email" name="email" required/>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label><i class="fas fa-lock"></i> Password</label>
+              <input type="password" name="password" id="regPassword" required oninput="checkStrength(this.value)"/>
+              <div class="pw-strength-bar"><div id="pwBar"></div></div>
+              <small id="pwHint" style="color:var(--gray);font-size:0.78rem">Min 8 chars, 1 uppercase, 1 number, 1 special character</small>
+            </div>
+            <div class="form-group">
+              <label><i class="fas fa-phone"></i> Phone Number</label>
+              <input type="tel" name="phone" required/>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label><i class="fas fa-birthday-cake"></i> Age</label>
+              <input type="number" name="age" min="1" max="120" required/>
+            </div>
+            <div class="form-group">
+              <label><i class="fas fa-tint"></i> Blood Group</label>
+              <select name="blood_group" required>
+                <option value="">Select Blood Group</option>
+                {% for bg in blood_groups %}
+                <option value="{{ bg }}">{{ bg }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label><i class="fas fa-venus-mars"></i> Gender</label>
+              <select name="gender" required>
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label><i class="fas fa-heartbeat"></i> Organ</label>
+              <select name="organ" required>
+                <option value="">Select Organ</option>
+                {% for organ in organs %}
+                <option value="{{ organ }}">{{ organ }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label><i class="fas fa-city"></i> City</label>
+              <input type="text" name="city" required/>
+            </div>
+            <div class="form-group">
+              <label><i class="fas fa-map-marker-alt"></i> State</label>
+              <input type="text" name="state" required/>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-full">
+            <i class="fas fa-user-plus"></i> Register
+          </button>
+        </form>
+        <p class="auth-switch">Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="auth-info-strip">
+  <div class="auth-info-inner">
+    <div class="auth-info-item"><i class="fas fa-check-circle"></i> Instant match notifications</div>
+    <div class="auth-info-item"><i class="fas fa-check-circle"></i> SMS alerts for matches</div>
+    <div class="auth-info-item"><i class="fas fa-check-circle"></i> 9 organ types supported</div>
+    <div class="auth-info-item"><i class="fas fa-check-circle"></i> All blood groups covered</div>
+  </div>
+  <p class="auth-info-quote">"Your decision to donate can turn someone's end into a new beginning."</p>
+</section>
+<script>
+function checkStrength(pw) {
+  let score = 0;
+  if (pw.length >= 8) score++;
+  if (/[A-Z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[!@#$%^&*(),.?":{}|<>_\-]/.test(pw)) score++;
+  const bar = document.getElementById('pwBar');
+  const colors = ['#e74c3c','#e67e22','#f1c40f','#27ae60'];
+  const labels = ['Weak','Fair','Good','Strong'];
+  bar.style.width = (score * 25) + '%';
+  bar.style.background = colors[score - 1] || '#e74c3c';
+  document.getElementById('pwHint').textContent = score === 4 ? '✅ Strong password' : labels[score-1] || 'Too weak';
+}
+</script>
+{% endblock %}
